@@ -125,5 +125,17 @@ npm run build        # Production build
 - **Phase 4**: Browser Automation — Facebook, Craigslist, OfferUp via Playwright
 - **Phase 5**: Buyer Search UI — unified search with platform filter pills
 
+## Git Workflow
+Follow good software development practices for all changes:
+
+- **Use branches** — never commit feature work directly to `master`. Create a branch per feature/fix:
+  ```bash
+  git checkout -b feature/my-feature-name
+  ```
+- **Commit frequently** — small, logical commits after each meaningful change (not just at the end of a session)
+- **Descriptive commit messages** — summarize the "why", not just the "what"
+- **Merge via PR** — push the branch to GitHub and merge into `master` so there's a clear history and easy revert points
+- **Before starting any significant work**, create a branch so the current `master` state is always a safe rollback point
+
 ## GitHub
 https://github.com/sglinski96/marketplace-aggregator
