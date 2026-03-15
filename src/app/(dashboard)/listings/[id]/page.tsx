@@ -19,6 +19,7 @@ import {
   ArrowLeft,
   Sparkles,
   Package,
+  Pencil,
 } from "lucide-react";
 
 const PLATFORM_COLORS: Record<string, string> = {
@@ -65,6 +66,12 @@ export default async function ListingDetailPage({
             AI Generated
           </Badge>
         )}
+        <Link href={`/listings/${listing.id}/edit`}>
+          <Button variant="outline" size="sm" className="gap-2">
+            <Pencil className="h-4 w-4" />
+            Edit
+          </Button>
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">

@@ -64,7 +64,7 @@ Generate an optimized marketplace listing with this exact JSON structure:
   "title": "compelling title under 80 characters optimized for search",
   "description": "detailed 3-4 paragraph description highlighting key features, condition details, dimensions if visible, and why a buyer would want this item",
   "suggestedPrice": 0,
-  "category": "most appropriate category (e.g., Electronics, Clothing, Furniture, Collectibles, etc.)",
+  "category": "one of exactly: Electronics, Clothing & Accessories, Furniture, Home & Garden, Collectibles, Sporting Goods, Toys & Games, Books & Media, Vehicles, Musical Instruments, Art, Jewelry, Baby Items, Tools, Other",
   "condition": "one of: New, Like New, Very Good, Good, Acceptable, For Parts",
   "tags": ["tag1", "tag2", "tag3", "tag4", "tag5"]
 }
