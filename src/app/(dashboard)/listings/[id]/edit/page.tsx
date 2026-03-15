@@ -16,12 +16,13 @@ import {
 import {
   Card,
   CardContent,
+  CardDescription,
   CardHeader,
   CardTitle,
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "@/components/ui/use-toast";
-import { ArrowLeft, Loader2, X } from "lucide-react";
+import { ArrowLeft, Loader2, Upload, X, Lock } from "lucide-react";
 import Link from "next/link";
 
 const CONDITIONS = [
@@ -51,6 +52,8 @@ const CATEGORIES = [
   "Other",
 ];
 
+const POSTED_STATUSES = ["SUCCESS", "POSTING"];
+
 export default function EditListingPage({
   params,
 }: {
@@ -65,6 +68,10 @@ export default function EditListingPage({
   const [condition, setCondition] = useState("GOOD");
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
+  const [images, setImages] = useState<string[]>([]);
+  const [photosLocked, setPhotosLocked] = useState(false);
+  const [lockedPlatforms, setLockedPlatforms] = useState<string[]>([]);
+  const [uploadingImages, setUploadingImages] = useState(false);
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
 
@@ -80,6 +87,18 @@ export default function EditListingPage({
         setCategory(data.category);
         setCondition(data.condition);
         setTags(data.tags ?? []);
+        setImages(data.images ?? []);
+
+        // Lock photos if any platform has been posted or is posting
+        const posted = (data.platformListings ?? [])
+          .filter((pl: { status: string; platform: string }) =>
+            POSTED_STATUSES.includes(pl.status)
+          )
+          .map((pl: { platform: string }) => pl.platform);
+        if (posted.length > 0) {
+          setPhotosLocked(true);
+          setLockedPlatforms(posted);
+        }
       } catch {
         toast({
           title: "Failed to load listing",
@@ -92,6 +111,34 @@ export default function EditListingPage({
     }
     fetchListing();
   }, [params.id, router]);
+
+  async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+
+    setUploadingImages(true);
+    const formData = new FormData();
+    Array.from(files).forEach((file) => formData.append("files", file));
+
+    try {
+      const res = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
+      if (!res.ok) throw new Error("Upload failed");
+      const data = await res.json();
+      setImages((prev) => [...prev, ...data.urls]);
+      toast({ title: "Images uploaded successfully" });
+    } catch {
+      toast({
+        title: "Upload failed",
+        description: "Failed to upload images. Please try again.",
+        variant: "destructive",
+      });
+    } finally {
+      setUploadingImages(false);
+    }
+  }
 
   function addTag() {
     const trimmed = tagInput.trim();
@@ -113,17 +160,22 @@ export default function EditListingPage({
 
     setSaving(true);
     try {
+      const body: Record<string, unknown> = {
+        title,
+        description,
+        price: parseFloat(price),
+        category,
+        condition,
+        tags,
+      };
+      if (!photosLocked) {
+        body.images = images;
+      }
+
       const res = await fetch(`/api/listings/${params.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          title,
-          description,
-          price: parseFloat(price),
-          category,
-          condition,
-          tags,
-        }),
+        body: JSON.stringify(body),
       });
 
       if (!res.ok) {
@@ -164,6 +216,68 @@ export default function EditListingPage({
         <h1 className="text-2xl font-bold text-slate-900">Edit Listing</h1>
       </div>
 
+      {/* Photos */}
+      <Card>
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            Photos
+            {photosLocked && <Lock className="h-4 w-4 text-slate-400" />}
+          </CardTitle>
+          {photosLocked ? (
+            <CardDescription className="text-amber-600">
+              Photos cannot be changed — this listing has already been posted to{" "}
+              {lockedPlatforms.join(", ")}.
+            </CardDescription>
+          ) : (
+            <CardDescription>
+              Add or remove photos. Up to 12 total.
+            </CardDescription>
+          )}
+        </CardHeader>
+        <CardContent>
+          <div className="grid grid-cols-4 gap-3">
+            {images.map((url, i) => (
+              <div key={i} className="relative aspect-square rounded-lg overflow-hidden group">
+                <img
+                  src={url}
+                  alt={`Photo ${i + 1}`}
+                  className="w-full h-full object-cover"
+                />
+                {!photosLocked && (
+                  <button
+                    onClick={() => setImages(images.filter((_, idx) => idx !== i))}
+                    className="absolute top-1 right-1 bg-red-500 text-white rounded-full p-0.5 opacity-0 group-hover:opacity-100 transition-opacity"
+                  >
+                    <X className="h-3 w-3" />
+                  </button>
+                )}
+              </div>
+            ))}
+            {!photosLocked && images.length < 12 && (
+              <label className="aspect-square rounded-lg border-2 border-dashed border-slate-300 hover:border-blue-400 flex flex-col items-center justify-center cursor-pointer transition-colors">
+                {uploadingImages ? (
+                  <Loader2 className="h-6 w-6 text-slate-400 animate-spin" />
+                ) : (
+                  <>
+                    <Upload className="h-6 w-6 text-slate-400 mb-1" />
+                    <span className="text-xs text-slate-400">Add photo</span>
+                  </>
+                )}
+                <input
+                  type="file"
+                  accept="image/*"
+                  multiple
+                  className="hidden"
+                  onChange={handleImageUpload}
+                  disabled={uploadingImages}
+                />
+              </label>
+            )}
+          </div>
+        </CardContent>
+      </Card>
+
+      {/* Listing Details */}
       <Card>
         <CardHeader>
           <CardTitle>Listing Details</CardTitle>
