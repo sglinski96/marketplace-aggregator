@@ -14,6 +14,7 @@ const updateListingSchema = z.object({
     .optional(),
   images: z.array(z.string().url()).optional(),
   tags: z.array(z.string()).optional(),
+  location: z.string().optional(),
 });
 
 export async function GET(
