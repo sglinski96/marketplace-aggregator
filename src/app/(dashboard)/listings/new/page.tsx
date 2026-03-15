@@ -79,6 +79,7 @@ export default function NewListingPage() {
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
   const [images, setImages] = useState<string[]>([]);
+  const [location, setLocation] = useState("");
   const [selectedPlatforms, setSelectedPlatforms] = useState<string[]>([]);
 
   // UI state
@@ -208,6 +209,7 @@ export default function NewListingPage() {
           condition,
           images,
           tags,
+          location: location.trim() || undefined,
           aiGenerated: generatingAI,
         }),
       });
@@ -441,6 +443,21 @@ export default function NewListingPage() {
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="location">
+              Location{" "}
+              <span className="text-slate-400 text-xs font-normal">
+                (city or zip — used by Facebook &amp; Craigslist)
+              </span>
+            </Label>
+            <Input
+              id="location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="e.g. San Francisco, CA or 94105"
+            />
           </div>
 
           <div className="space-y-2">

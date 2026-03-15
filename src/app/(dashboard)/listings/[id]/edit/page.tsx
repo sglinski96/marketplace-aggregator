@@ -68,6 +68,7 @@ export default function EditListingPage({
   const [condition, setCondition] = useState("GOOD");
   const [tags, setTags] = useState<string[]>([]);
   const [tagInput, setTagInput] = useState("");
+  const [location, setLocation] = useState("");
   const [images, setImages] = useState<string[]>([]);
   const [photosLocked, setPhotosLocked] = useState(false);
   const [lockedPlatforms, setLockedPlatforms] = useState<string[]>([]);
@@ -87,6 +88,7 @@ export default function EditListingPage({
         setCategory(data.category);
         setCondition(data.condition);
         setTags(data.tags ?? []);
+        setLocation(data.location ?? "");
         setImages(data.images ?? []);
 
         // Lock photos if any platform has been posted or is posting
@@ -167,6 +169,7 @@ export default function EditListingPage({
         category,
         condition,
         tags,
+        location: location.trim() || undefined,
       };
       if (!photosLocked) {
         body.images = images;
@@ -351,6 +354,21 @@ export default function EditListingPage({
                 ))}
               </SelectContent>
             </Select>
+          </div>
+
+          <div className="space-y-2">
+            <Label htmlFor="location">
+              Location{" "}
+              <span className="text-slate-400 text-xs font-normal">
+                (city or zip — used by Facebook &amp; Craigslist)
+              </span>
+            </Label>
+            <Input
+              id="location"
+              value={location}
+              onChange={(e) => setLocation(e.target.value)}
+              placeholder="e.g. San Francisco, CA or 94105"
+            />
           </div>
 
           <div className="space-y-2">

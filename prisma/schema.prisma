@@ -96,6 +96,7 @@ model Listing {
   condition        ItemCondition     @default(GOOD)
   images           String[]
   tags             String[]
+  location         String?
   aiGenerated      Boolean           @default(false)
   platformListings PlatformListing[]
   createdAt        DateTime          @default(now())

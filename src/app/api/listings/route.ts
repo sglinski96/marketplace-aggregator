@@ -12,6 +12,7 @@ const createListingSchema = z.object({
   condition: z.enum(["NEW", "LIKE_NEW", "VERY_GOOD", "GOOD", "ACCEPTABLE", "FOR_PARTS"]),
   images: z.array(z.string().url()),
   tags: z.array(z.string()).default([]),
+  location: z.string().optional(),
   aiGenerated: z.boolean().default(false),
 });
 

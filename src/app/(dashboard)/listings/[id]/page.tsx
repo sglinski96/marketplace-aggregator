@@ -58,6 +58,7 @@ export default async function ListingDetailPage({
           <p className="text-slate-500">
             ${Number(listing.price).toFixed(2)} •{" "}
             {listing.condition.replace("_", " ")} • {listing.category}
+            {listing.location && ` • ${listing.location}`}
           </p>
         </div>
         {listing.aiGenerated && (
