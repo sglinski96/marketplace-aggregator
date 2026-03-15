@@ -20,6 +20,7 @@ import {
   TrendingUp,
   FileEdit,
 } from "lucide-react";
+import { DeleteDraftButton } from "@/components/delete-draft-button";
 
 const PLATFORM_COLORS: Record<string, string> = {
   EBAY: "bg-yellow-100 text-yellow-800",
@@ -185,10 +186,13 @@ export default async function DashboardPage() {
 
                   <div className="flex items-center gap-2 flex-wrap justify-end">
                     {!listing.platformListings.some((pl) => pl.status === "SUCCESS" || pl.status === "POSTING") && (
-                      <Badge variant="secondary" className="gap-1 text-slate-500">
-                        <FileEdit className="h-3 w-3" />
-                        Draft
-                      </Badge>
+                      <>
+                        <Badge variant="secondary" className="gap-1 text-slate-500">
+                          <FileEdit className="h-3 w-3" />
+                          Draft
+                        </Badge>
+                        <DeleteDraftButton listingId={listing.id} />
+                      </>
                     )}
                     {listing.platformListings.map((pl) => (
                       <div
