@@ -18,6 +18,7 @@ import {
   Clock,
   XCircle,
   TrendingUp,
+  FileEdit,
 } from "lucide-react";
 
 const PLATFORM_COLORS: Record<string, string> = {
@@ -60,6 +61,10 @@ export default async function DashboardPage() {
     (pl) => pl.status === "PENDING" || pl.status === "POSTING"
   ).length;
 
+  const totalDrafts = listings.filter((l) =>
+    !l.platformListings.some((pl) => pl.status === "SUCCESS" || pl.status === "POSTING")
+  ).length;
+
   return (
     <div className="space-y-8">
       {/* Header */}
@@ -79,13 +84,20 @@ export default async function DashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
         <StatCard
           title="Active Listings"
           value={totalActive}
           description="Posted successfully"
           icon={<Package className="h-5 w-5 text-blue-600" />}
           color="blue"
+        />
+        <StatCard
+          title="Drafts"
+          value={totalDrafts}
+          description="Not yet posted"
+          icon={<FileEdit className="h-5 w-5 text-slate-500" />}
+          color="slate"
         />
         <StatCard
           title="Connected Platforms"
@@ -172,26 +184,26 @@ export default async function DashboardPage() {
                   </div>
 
                   <div className="flex items-center gap-2 flex-wrap justify-end">
-                    {listing.platformListings.length === 0 ? (
-                      <span className="text-xs text-slate-400">
-                        Not posted yet
-                      </span>
-                    ) : (
-                      listing.platformListings.map((pl) => (
-                        <div
-                          key={pl.id}
-                          className="flex items-center gap-1"
-                          title={pl.status}
-                        >
-                          <span
-                            className={`text-xs px-2 py-0.5 rounded-full font-medium ${PLATFORM_COLORS[pl.platform] ?? "bg-slate-100 text-slate-600"}`}
-                          >
-                            {pl.platform}
-                          </span>
-                          {STATUS_ICONS[pl.status]}
-                        </div>
-                      ))
+                    {!listing.platformListings.some((pl) => pl.status === "SUCCESS" || pl.status === "POSTING") && (
+                      <Badge variant="secondary" className="gap-1 text-slate-500">
+                        <FileEdit className="h-3 w-3" />
+                        Draft
+                      </Badge>
                     )}
+                    {listing.platformListings.map((pl) => (
+                      <div
+                        key={pl.id}
+                        className="flex items-center gap-1"
+                        title={pl.status}
+                      >
+                        <span
+                          className={`text-xs px-2 py-0.5 rounded-full font-medium ${PLATFORM_COLORS[pl.platform] ?? "bg-slate-100 text-slate-600"}`}
+                        >
+                          {pl.platform}
+                        </span>
+                        {STATUS_ICONS[pl.status]}
+                      </div>
+                    ))}
                   </div>
                 </div>
               ))}
@@ -241,12 +253,13 @@ function StatCard({
   value: number;
   description: string;
   icon: React.ReactNode;
-  color: "blue" | "green" | "yellow";
+  color: "blue" | "green" | "yellow" | "slate";
 }) {
   const colorClasses = {
     blue: "bg-blue-50",
     green: "bg-green-50",
     yellow: "bg-yellow-50",
+    slate: "bg-slate-100",
   };
 
   return (
